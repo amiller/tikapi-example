@@ -7,6 +7,7 @@ from urllib.parse import urlparse, parse_qs
 import threading
 import webbrowser
 import json
+from tikapi import TikAPI, ValidationException, ResponseException
 
 load_dotenv()
 
@@ -33,6 +34,21 @@ class TokenHandler(BaseHTTPRequestHandler):
 def start_server():
     server = HTTPServer(('127.0.0.1', 8000), TokenHandler)
     server.serve_forever()
+
+def check_public_profile(api_key, username):
+    print(f"\nFetching public profile for @{username}...")
+    api = TikAPI(api_key)
+    
+    try:
+        response = api.public.check(username=username)
+        print("\nPublic Profile Info:")
+        print(json.dumps(response.json(), indent=2))
+    except ValidationException as e:
+        print(f"Validation error: {e} - Field: {e.field}")
+    except ResponseException as e:
+        print(f"Response error: {e} - Status: {e.response.status_code}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
 
 def main():
     # Get API key and client ID from environment
@@ -79,6 +95,9 @@ def main():
             data = response.json()
             print("\nUser Session Info:")
             print(json.dumps(data, indent=2))
+            
+            # After successful auth, check a public profile
+            check_public_profile(api_key, data['data']['username'])
         else:
             print(f"Failed to get session info: {response.status_code}")
             print(f"Response: {response.text}")
