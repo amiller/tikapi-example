@@ -21,7 +21,7 @@ A minimal CLI script that handles TikTok OAuth authorization via TikAPI and disp
    python app.py
    ```
 
-## How it 
+## How it g
 
 1. **OAuth Flow**: 
    - Starts a local server on port 8000
