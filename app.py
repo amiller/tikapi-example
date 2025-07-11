@@ -60,8 +60,25 @@ def check_public_profile(api_key, username):
     
     try:
         response = api.public.check(username=username)
-        print("\nPublic Profile Info:")
-        print(json.dumps(response.json(), indent=2))
+        data = response.json()
+        
+        if 'userInfo' in data:
+            user_info = data['userInfo']
+            stats = user_info.get('stats', {})
+            user = user_info.get('user', {})
+            
+            print("\nProfile Summary:")
+            print(f"Username: @{user.get('uniqueId', username)}")
+            print(f"Nickname: {user.get('nickname', '')}")
+            print(f"Followers: {stats.get('followerCount', 0)}")
+            print(f"Following: {stats.get('followingCount', 0)}")
+            print(f"Likes: {stats.get('heartCount', 0)}")
+            print(f"Videos: {stats.get('videoCount', 0)}")
+            if user.get('signature'):
+                print(f"Bio: {user.get('signature')}")
+        else:
+            print("Could not find user info in response")
+            
     except ValidationException as e:
         print(f"Validation error: {e} - Field: {e.field}")
     except ResponseException as e:
