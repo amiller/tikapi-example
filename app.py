@@ -122,12 +122,25 @@ def check_notifications(api_key, account_key):
                 digg = notif['digg']
                 if 'from_user' in digg and digg['from_user']:
                     user = digg['from_user'][0]
-                    print(f"Like from @{user.get('nickname')} at {create_time}")
+                    print(f"👍 Like from @{user.get('nickname')} at {create_time}")
                 if 'aweme' in digg:
                     aweme = digg['aweme']
-                    print(f"  On post: {aweme.get('desc', '')[:100]}")
+                    print(f"  📝 On post: {aweme.get('desc', '')[:100]}")
+            elif 'at' in notif:
+                comment = notif['at']['comment']
+                content = notif['at'].get('content', '')  # Get the @mention content if present
+                if 'user' in comment:
+                    user = comment['user']
+                    print(f"💬 Comment from @{user.get('nickname')} at {create_time}")
+                    if content:
+                        print(f"  @ {content}")  # Show the @mention text if present
+                    print(f"  📝 {comment.get('text', '')[:100]}")
+                if 'aweme' in comment:  # Use the main video info
+                    aweme = comment['aweme']
+                    author = aweme.get('author', {})
+                    print(f"  🎥 On {author.get('nickname', '')}'s video: {aweme.get('desc', '')[:100]}")
             else:
-                print(f"Notification type {notif_type} at {create_time}")
+                print(f"📢 Notification type {notif_type} at {create_time}")
                 
     except ValidationException as e:
         print(f"Validation error: {e} - Field: {e.field}")
